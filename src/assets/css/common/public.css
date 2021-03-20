@@ -1,0 +1,10 @@
+html,body{
+    font-family: 'Avenir', Helvetica, Arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    margin:0px;
+    padding:0px;
+    background-color:#EFEFEF;
+}
+ul,li{margin:0px;padding:0px;list-style: none;}
+input,button{border:0 none;border-radius: 0px;outline:none;}
