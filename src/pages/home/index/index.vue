@@ -1,8 +1,8 @@
 <template>
   <div class="page">
     <div :class="{header:true,scroll:isScroll}">
-      <div class="classify-icon"></div>
-      <div class="search-wrap" @click="goPage('/good/classify')">
+      <div class="classify-icon" @click="goPage('/good/classify')"></div>
+      <div class="search-wrap" @click="searchShow.show = true">
         <div class="search-icon"></div>
         <div class="text">请输入宝贝名称</div>
       </div>
@@ -141,12 +141,14 @@
         <div class="goods-price">¥{{item.price}}</div>
       </div>
     </div>
+    <my-search :show="searchShow" v-show="searchShow.show"></my-search>
   </div>
 </template>
 
 <script>
 // 引入swiperjs  需要安装一个插件  在package.json里配置 支持commen.js规范 否则Swiper无法使用
 import Swiper from "../../../assets/js/libs/swiper-3.4.2.min.js"
+import MySearch from "../../../components/search/index.vue"
 // vueX的辅助函数
 import {mapActions,mapState} from 'vuex'
 export default {
@@ -154,8 +156,14 @@ export default {
   data() {
     return {
       // 控制顶部导航栏变色变量
-      isScroll:false
+      isScroll:false,
+      // 给子组件穿传的值
+      searchShow:{show:false}
     };
+  },
+  components:{
+    // 搜索组件
+    MySearch
   },
   created() {
     // 添加滚动事件 

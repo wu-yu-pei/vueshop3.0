@@ -2,7 +2,7 @@
   <div class="classify">
       <div class="classify-top">
         <div class="back" @click="$router.go(-1)"></div>
-        <div class="search"><input type="text" name="" id="" placeholder="请输入宝贝名称"></div>
+        <div class="search"><input type="text" name="" id="" placeholder="请输入宝贝名称" @click="searchShow.show = true"></div>
       </div>
       <div class="classify-main">
         <div class="scroll-classify" ref="scroll-classify">
@@ -16,17 +16,25 @@
           </div>
         </router-view>
       </div>
+      <my-search :show="searchShow" v-show="searchShow.show"></my-search>
   </div>
 </template>
 
 <script>
 import IScroll from '../../../assets/js/libs/iscroll'
 import {mapActions,mapMutations,mapState} from 'vuex'
+import MySearch from "../../../components/search/index.vue"
+
 export default {
   data(){
     return {
-
+       // 给子组件穿传的值
+      searchShow:{show:false}
     }
+  },
+  components:{
+    // 搜索组件
+    MySearch
   },
   created() {
     this.cid = this.$route.query.cid?this.$route.query.cid:''
