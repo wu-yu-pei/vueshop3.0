@@ -4,3 +4,7 @@ import { request } from "../../assets/js/utils/request";
 export function getClassifyData() {
     return request(config.baseApi + "home/category/menu?token=" + config.token);
 }
+// 获取分类页面右侧内容
+export function getClassifyRightData(cid = '') {
+    return request(config.baseApi + "home/category/show?cid=" + cid + "&token=" + config.token);
+}

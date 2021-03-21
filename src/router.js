@@ -97,12 +97,6 @@ let router = new Router({
             }]
         },
         {
-            path: "/classify",
-            name: "classify",
-            component: () =>
-                import ("./pages/home/classify")
-        },
-        {
             path: "/skip",
             name: "skip",
             component: () =>

@@ -7,11 +7,14 @@
       <div class="classify-main">
         <div class="scroll-classify" ref="scroll-classify">
           <div>
-          <div v-for="(item,index) in classify" ref="item" :key="index" :class="{active:item.active}" @click="changeColor(index)">{{item.title}}</div>
+          <div v-for="(item,index) in classify" ref="item" :key="index" :class="{active:item.active}" @click="goPage('/good/classify/item?cid='+item.cid+'',index)">{{item.title}}</div>
           </div>
         </div>
-        <router-view></router-view>
-       
+        <router-view>
+          <div>
+            
+          </div>
+        </router-view>
       </div>
   </div>
 </template>
@@ -26,12 +29,25 @@ export default {
     }
   },
   created() {
+    this.cid = this.$route.query.cid?this.$route.query.cid:''
     // 获取数据
     this.getClassify({success:() => {
       this.$nextTick(() => {
         // 重新计算高度
         this.myScroll.refresh()
-        this.setselect({index:0})
+        // cid
+        if(this.classify>0 && this.cid){
+          let i = 0
+          for(;i<this.classify.length;i++) {
+          if(this.classify[i].cid == this.cid ) {
+            break
+          }
+        }
+          this.setselect({index:i})
+        }else {
+          // this.setselect({index:0})
+          this.goPage('/good/classify/item?cid='+this.classify[0].cid+'',0)
+        }
       })
     }})
   },
@@ -69,6 +85,10 @@ export default {
          this.myScroll.scrollTo(0,-height*index,1000)
       }
       this.setselect({index:index})
+    },
+    goPage(url,index) {
+      this.$router.replace(url)
+      this.changeColor(index)
     }
   },
   computed:{

@@ -1,9 +1,10 @@
-import { getClassifyData } from "../../../api/goods";
+import { getClassifyData, getClassifyRightData } from "../../../api/goods";
 import Vue from 'vue'
 export default {
     namespaced: true,
     state: {
-        classify: []
+        classify: [],
+        right: []
     },
     mutations: {
         ['SET_CLASSIFY'](state, payload) {
@@ -24,6 +25,10 @@ export default {
             // 这里改变了数组里面某个值的状态，可能出现视图不渲染的情况   解决方案：this.$set() 但是在vueX里面没有this.$set()所以需要导入vue
             state.classify[payload.index].active = true
                 //Vue.set(state.classify, payload.index, state.classify[payload.index]) //三个参数 第一个：原数据 第二个：要改变的索引值 第三个：改变之后的值
+        },
+        ['SET_RIGHT'](state, payload) {
+            state.right = payload.right
+            console.log('分类页面右侧数据：', state.right);
         }
     },
     actions: {
@@ -40,6 +45,19 @@ export default {
                     }
                 }
 
+            })
+        },
+        getClassifyRight(conText, payload) {
+            getClassifyRightData(payload.cid).then(res => {
+                if (res.code === 200) {
+                    conText.commit('SET_RIGHT', { right: res.data })
+                    if (payload.success) {
+                        payload.success()
+                    }
+                }
+                if (res.code === 201) {
+                    conText.commit('SET_RIGHT', { right: [] })
+                }
             })
         }
     }
