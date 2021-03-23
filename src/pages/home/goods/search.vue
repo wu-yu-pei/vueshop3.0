@@ -7,18 +7,18 @@
           <div class="search-icon"></div>
           <div class="search-text" @click="searchShow.show = true">{{ this.$route.query.keyword }}</div>
         </div>
-        <div class="screen-btn">筛选</div>
+        <div class="screen-btn" @click="isScreen = true">筛选</div>
       </div>
       <div class="order-main">
-        <div class="order-item">
-          <div class="order-text">综合</div>
+        <div :class="{'order-item':true,active:isPriveOder}" @click="isPriveOder = !isPriveOder,isSalesOder=false">
+          <div class="order-text" >综合</div>
           <div class="order-icon"></div>
-          <ul class="order-menu">
-            <li class="active"></li>
+          <ul class="order-menu" v-show="isPriveOder">
+            <li :class="{active:item.active}" v-for="(item,index) in priceOrderList" :key="index" @click="selectPriceOrder(index)">{{item.title}}</li>
           </ul>
         </div>
-        <div class="order-item">
-          <div class="order-text">销量</div>
+        <div :class="{'order-item':true,active:isSalesOder}" @click="selectSales()">
+          <div class="order-text" >销量</div>
         </div>
       </div>
     </div>
@@ -65,18 +65,18 @@
       </div>
       <div class="no-data">没有相关商品！</div>
     </div>
-    <!-- <div
+    <div
       ref="mask"
-      class="mask" ></div> -->
-    <div ref="screen">
+      class="mask" v-show="isScreen" @click="isScreen = false"></div>
+    <div ref="screen" :class="isScreen? 'screen move':'screen unmove'">
       <div>
         <div class="attr-wrap">
-          <div class="attr-title-wrap">
+          <div class="attr-title-wrap" @click="isClassify = !isClassify">
             <div class="attr-name">分类</div>
-            <div class="attr-icon"></div>
+            <div :class="{'attr-icon':true,up:isClassify}"></div>
           </div>
-          <div class="item-wrap">
-            <div class="item: true"></div>
+          <div class="item-wrap" v-show="isClassify">
+            <div :class="{item:true,active:item.active}" v-for="(item,index) in classifyData" :key="index" @click="change(index)">{{item.title}}</div>
           </div>
         </div>
         <div style="width: 100%; height: 1px; backgroundcolor: #efefef"></div>
@@ -92,10 +92,17 @@
                 <input type="tel" placeholder="最高价" />
               </div>
             </div>
-            <div class="attr-icon"></div>
+            <div :class="{'attr-icon':true,up:isSize}" @click="isSize = !isSize"></div>
           </div>
-          <div class="item-wrap">
-            <div class="item"></div>
+          <div class="item-wrap" v-show="isSize">
+            <div class="item active">呵呵</div>
+            <div class="item">呵呵</div>
+            <div class="item">呵呵</div>
+            <div class="item">呵呵</div>
+            <div class="item">呵呵</div>
+            <div class="item">呵呵</div>
+            <div class="item">呵呵</div>
+            <div class="item">呵呵</div>
           </div>
         </div>
         <div
@@ -123,6 +130,7 @@
     </div>
     <my-search :show="searchShow" v-show="searchShow.show" :isLocal="true"></my-search>
   </div>
+  
 </template>
 
 <script>
@@ -133,28 +141,94 @@ export default {
   data() {
     return {
        // 给子组件穿传的值
-      searchShow:{show:false}
+      searchShow:{show:false},
+      // 综合菜单下拉
+      isPriveOder:false,
+      // 销量颜色
+      isSalesOder:false,
+      isScreen:false,
+      isClassify:true,
+      isSize:true,
+      // 保存数据 服用 防止与分类页面数据发生冲突
+      classifyData:'',
+      // 下拉出来的数据
+      priceOrderList:[
+        {
+          title:"综合",type:'all',active:true
+        },
+        {
+          title:"价格从高到底",type:'up',active:false
+        },
+        {
+          title:"价格从低到高",type:'down',active:false
+        }
+      ]
     };
   },
   components: {
     MySearch
   },
   computed: {
-    ...mapState({}),
+    // 分类数据，数据的复用
+    ...mapState({
+      classify:(state) => state.goods.classify
+    }),
   },
-  created() {},
+  created() {
+    //发送一次网络请求
+    this.getClassify({success:() => {
+    this.classifyData = this.classify
+    // 默认第一个带颜色
+    this.classifyData[0].active = true
+    }})
+  },
   mounted() {},
   methods: {
-    ...mapActions({}),
+    ...mapActions({
+      getClassify:'goods/getClassify'
+    }),
     ...mapMutations({}),
     selectPrice() {},
+
+    //返回按钮
     back() {
       this.$router.go(-1);
     },
+
     //价格排序
-    selectPriceOrder(index) {},
+    selectPriceOrder(index) {
+      for(let i = 0;i<this.priceOrderList.length;i++) {
+        if(this.priceOrderList[i].active) {
+          this.priceOrderList[i].active = false
+          break
+        }
+      }
+      this.priceOrderList[index].active = true
+      // 解决部分情况下试图不渲染
+      this.$set(this.priceOrderList,index,this.priceOrderList[index])
+      this.isSalesOder = false
+    },
+
     //销量排序
-    selectSales() {},
+    selectSales() {
+      this.isSalesOder = true
+      for(let i = 0;i<this.priceOrderList.length;i++) {
+        if(this.priceOrderList[i].active) {
+          this.priceOrderList[i].active = false
+          break
+        }
+      }
+    },
+    // 点击改变右侧分类颜色
+    change(index){
+      for(let i = 0;i<this.classifyData.length;i++) {
+        if(this.classifyData[i].active) {
+          this.classifyData[i].active = false
+          break
+        }
+      }
+     this.classifyData[index].active = true
+    },
     //禁用touchmove事件
     disableScreenTochmove() {},
   },
@@ -279,7 +353,12 @@ export default {
   background-position: center;
   background-repeat: no-repeat;
 }
-
+body > div > div > div.search-top > div.order-main > div.\{\'order-item\'\:true\,active\:true\} > div.order-icon {
+    background-image: url("../../../assets/images/home/goods/up.png");
+  background-size: 100%;
+  background-position: center;
+  background-repeat: no-repeat;
+}
 /*.search-top .order-main .order-item .order-icon.up{background-image:url("../../../../assets/images/home/goods/up.png");background-size:100%;background-position: center;background-repeat: no-repeat;}*/
 .search-top .order-main .order-item .order-menu {
   width: 688%;
@@ -372,7 +451,7 @@ export default {
   z-index: 99;
   left: 0px;
   top: 0px;
-  /* background-color: rgba(0, 0, 0, 0.3); */
+  background-color: rgba(0, 0, 0, 0.3);
 }
 
 .screen {
