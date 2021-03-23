@@ -94,14 +94,13 @@
                 // 把值传到vueX里面 
                 this.SET_HISTORYKEYWORD({historyKeyword:this.keywords})
                
-                
                 // 跳转到 搜索页面
                 if(this.isLocal) {
-                     this.$router.replace('/search/?keyword='+tempkeyword) 
+                    this.$router.replace('/search?keyword='+tempkeyword)
                 }else {
-                    this.$router.push('/search/?keyword='+tempkeyword) 
+                    console.log(2);
+                    this.$router.push('/search?keyword='+tempkeyword)
                 }
-               
                 //输入完之后清空输入框
                 this.keyword = ''
                 this.show.show = false
@@ -124,7 +123,7 @@
 </script>
 
 <style scoped>
-    .search-component{width:100%;height:100%;position: fixed;z-index:99;left:0px;top:0px;background-color:#ffffff;}
+    .search-component{width:100%;height:100%;position: fixed;z-index:99;left:0px;top:0px;background-color:#ffffff; opacity: 7;}
     .search-component .search-header{width:100%;height:1rem;border-bottom:#EFEFEF solid 1px;display:flex;display:-webkit-flex;align-items: center;-webkit-align-items: center;}
     .search-component .search-header .close{width:0.5rem;height: 0.5rem;background-image:url("../../assets/images/common/search_x.png");background-size:100%;background-repeat: no-repeat;background-position: center;margin-left:0.2rem;margin-right:0.2rem;}
     .search-component .search-header .search-wrap{width:78%;height:0.64rem;border:#B2B2B2 solid 1px;border-radius: 0.1rem;display:flex;display:-webkit-flex;align-items: center;-webkit-align-items: center;}

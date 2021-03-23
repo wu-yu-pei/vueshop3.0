@@ -9,7 +9,7 @@ export default {
     mutations: {
         ['SET_CLASSIFY'](state, payload) {
             state.classify = payload.classify
-            console.log('分类页面左侧数据：', state.classify);
+                // console.log('分类页面左侧数据：', state.classify);
         },
         // 改变分类左侧颜色
         ['SET_SELLECT'](state, payload) {
@@ -28,7 +28,7 @@ export default {
         },
         ['SET_RIGHT'](state, payload) {
             state.right = payload.right
-            console.log('分类页面右侧数据：', state.right);
+                // console.log('分类页面右侧数据：', state.right);
         }
     },
     actions: {

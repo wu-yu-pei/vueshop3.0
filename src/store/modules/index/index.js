@@ -12,20 +12,20 @@ export default {
         //修改快速导航数据
         ["SET_NAVS"](state, payload) {
             state.navs = payload.navs;
-            console.log("首页快速导航数据：", state.navs);
+            // console.log("首页快速导航数据：", state.navs);
         },
         //修改Swiper数据
         ['SET_SWIPER'](state, payload) {
             state.swipers = payload.swiper
-            console.log("首页轮播图数据：", state.swipers);
+                // console.log("首页轮播图数据：", state.swipers);
         },
         ['SET_GOODS'](state, payload) {
             state.goods = payload.goods
-            console.log("首页Goos数据：", state.goods);
+                // console.log("首页Goos数据：", state.goods);
         },
         ['SET_RECOM'](state, payload) {
             state.recom = payload.recom
-            console.log("首页为你推荐数据：", state.recom);
+                // console.log("首页为你推荐数据：", state.recom);
         }
     },
     actions: {

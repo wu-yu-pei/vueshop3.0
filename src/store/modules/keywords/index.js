@@ -1,9 +1,13 @@
-import { gethotData } from '../../../api/search/index'
+import { gethotData, getSearchData } from '../../../api/search/index'
 export default {
     namespaced: true,
     state: {
         historyKeyword: localStorage['historyKeyword'] ? JSON.parse(localStorage['historyKeyword']) : [],
-        hot: []
+        hot: [],
+        goods: {
+            goods: '',
+            page: 0
+        }
     },
     mutations: {
         // 设置数据
@@ -19,7 +23,11 @@ export default {
         },
         ['SET_HOT'](state, payload) {
             state.hot = payload.hot
-            console.log('热门搜索数据:', state.hot);
+                // console.log('热门搜索数据:', state.hot);
+        },
+        ['SET_GOODS'](state, payload) {
+            state.goods.goods = payload.goods
+            state.goods.page = payload.page
         }
     },
     actions: {
@@ -27,6 +35,16 @@ export default {
             gethotData().then(res => {
                 if (res.code === 200) {
                     conText.commit('SET_HOT', { hot: res.data })
+                }
+            })
+        },
+        getSearch(conText, payload) {
+            getSearchData(payload).then(res => {
+                if (res.code === 200) {
+                    console.log(res)
+                    conText.commit('SET_GOODS', { goods: res.data, page: res.pageinfo.pagenum })
+                } else {
+                    conText.commit('SET_GOODS', { goods: [] })
                 }
             })
         }

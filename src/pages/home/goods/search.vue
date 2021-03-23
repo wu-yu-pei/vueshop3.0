@@ -5,7 +5,7 @@
         <div class="back" @click="back()"></div>
         <div class="search-wrap">
           <div class="search-icon"></div>
-          <div class="search-text" @click="searchShow.show = true">{{ this.$route.query.keyword }}</div>
+          <div class="search-text" @click="searchshow()">{{this.$route.query.keyword}}</div>
         </div>
         <div class="screen-btn" @click="isScreen = true">筛选</div>
       </div>
@@ -23,47 +23,17 @@
       </div>
     </div>
     <div class="goods-main">
-      <div class="goods-list">
+      <div class="goods-list" v-for="(item,index) in goods.goods" :key="index">
         <div class="image">
-          <img src="//vueshop.glbuys.com/uploadfiles/1524554409.jpg" />
+          <img :src="item.image" />
         </div>
         <div class="goods-content">
-          <div class="goods-title">品牌男装</div>
-          <div class="price">¥100</div>
-          <div class="sales">销量<span>10</span>件</div>
+          <div class="goods-title">{{item.title}}</div>
+          <div class="price">¥{{item.price}}</div>
+          <div class="sales">销量<span>{{item.sales}}</span>件</div>
         </div>
       </div>
-      <div class="goods-list">
-        <div class="image">
-          <img src="//vueshop.glbuys.com/uploadfiles/1524554409.jpg" />
-        </div>
-        <div class="goods-content">
-          <div class="goods-title">品牌男装</div>
-          <div class="price">¥100</div>
-          <div class="sales">销量<span>10</span>件</div>
-        </div>
-      </div>
-      <div class="goods-list">
-        <div class="image">
-          <img src="//vueshop.glbuys.com/uploadfiles/1524554409.jpg" />
-        </div>
-        <div class="goods-content">
-          <div class="goods-title">品牌男装</div>
-          <div class="price">¥100</div>
-          <div class="sales">销量<span>10</span>件</div>
-        </div>
-      </div>
-      <div class="goods-list">
-        <div class="image">
-          <img src="//vueshop.glbuys.com/uploadfiles/1524554409.jpg" />
-        </div>
-        <div class="goods-content">
-          <div class="goods-title">品牌男装</div>
-          <div class="price">¥100</div>
-          <div class="sales">销量<span>10</span>件</div>
-        </div>
-      </div>
-      <div class="no-data">没有相关商品！</div>
+      <div class="no-data" v-show="goods.length<=0">没有相关商品！</div>
     </div>
     <div
       ref="mask"
@@ -85,37 +55,29 @@
             <div class="attr-name">价格区间</div>
             <div class="price-wrap">
               <div class="price-input">
-                <input type="tel" placeholder="最低价" />
+                <input v-model="minprice" type="tel" placeholder="最低价" />
               </div>
               <div class="price-line"></div>
               <div class="price-input">
-                <input type="tel" placeholder="最高价" />
+                <input v-model="maxprice" type="tel" placeholder="最高价" />
               </div>
             </div>
             <div :class="{'attr-icon':true,up:isSize}" @click="isSize = !isSize"></div>
           </div>
           <div class="item-wrap" v-show="isSize">
-            <div class="item active">呵呵</div>
-            <div class="item">呵呵</div>
-            <div class="item">呵呵</div>
-            <div class="item">呵呵</div>
-            <div class="item">呵呵</div>
-            <div class="item">呵呵</div>
-            <div class="item">呵呵</div>
-            <div class="item">呵呵</div>
+            <div :class="{item:true,active:item.active}" v-for="(item,index) in priceData" :key="index" @click="priceDataclick(index)">{{item.minprice+'-'+item.maxprice}}</div>
           </div>
         </div>
         <div
-          style="width: 100%; height: 0.3rem; backgroundcolor: #efefef"
-        ></div>
+          style="width: 100%; height: 0.3rem; backgroundcolor: #efefef"></div>
         <div>
           <div class="attr-wrap">
             <div class="attr-title-wrap">
-              <div class="attr-name"></div>
-              <div class="attr-icon"></div>
+              <div class="attr-name">颜色</div>
+              <div :class="{'attr-icon':true,up:colorisShow}" @click="colorisShow = !colorisShow"></div>
             </div>
-            <div class="item-wrap">
-              <div class="item: true"></div>
+            <div class="item-wrap" v-show="colorisShow">
+              <div :class="{item:true,active:item.active}" v-for="(item,index) in colorData" :key="index" @click="changeColor(index)">{{item.color}}</div>
             </div>
           </div>
           <div style="width: 100%; height: 1px; backgroundcolor: #efefef"></div>
@@ -124,7 +86,7 @@
       </div>
       <div class="handel-wrap">
         <div class="item">共<span>10</span>件</div>
-        <div class="item reset">全部重置</div>
+        <div class="item reset" @click="submit()">全部重置</div>
         <div class="item sure">确定</div>
       </div>
     </div>
@@ -136,6 +98,7 @@
 <script>
 import { mapState, mapActions, mapMutations } from "vuex";
 import MySearch from "../../../components/search/index.vue"
+import IScroll from '../../../assets/js/libs/iscroll'
 export default {
   name: "goods-search",
   data() {
@@ -151,6 +114,25 @@ export default {
       isSize:true,
       // 保存数据 服用 防止与分类页面数据发生冲突
       classifyData:'',
+      // 价格区间数据
+      priceData:[
+        {active:true,minprice:1,maxprice:49},
+        {active:false,minprice:50,maxprice:100},
+        {active:false,minprice:101,maxprice:149},
+        {active:false,minprice:150,maxprice:200},
+        {active:false,minprice:201,maxprice:250},
+        {active:false,minprice:251,maxprice:300},
+        {active:false,minprice:301,maxprice:999},
+      ],
+      colorData:[
+        {active:true,color:"红色"},
+        {active:false,color:"绿色"},
+        {active:false,color:"紫色"},
+        {active:false,color:"黄色"},
+        {active:false,color:"粉色"},
+      ],
+      // 颜色
+      colorisShow:true,
       // 下拉出来的数据
       priceOrderList:[
         {
@@ -171,7 +153,8 @@ export default {
   computed: {
     // 分类数据，数据的复用
     ...mapState({
-      classify:(state) => state.goods.classify
+      classify:(state) => state.goods.classify,
+      goods:state => state.keywords.goods
     }),
   },
   created() {
@@ -179,17 +162,38 @@ export default {
     this.getClassify({success:() => {
     this.classifyData = this.classify
     // 默认第一个带颜色
+    // iSSroll 异步问题
     this.classifyData[0].active = true
+    this.$nextTick(() => {
+      this.myscroll.refresh()
+    })
     }})
+    this.minprice=this.priceData[0].minprice
+    this.maxprice=this.priceData[0].maxprice
+    this.keyword = this.$route.query.keyword
+    this.getSearch({keyword:this.keyword})
   },
-  mounted() {},
+  mounted() {
+    // IsScroll   使用IScroll的时候一定要注意 异步问题 由于数据是异步获取 刚开始iSscroll获取的高度是不正确的 所以需要在获取数据的时候重新计算domd元素的高度 在create里面获取dom 必须用this.$nextTick() 延迟获取dom
+     this.$refs['screen'].addEventListener('touchmove',this.scrollPreventDefault)
+    this.myscroll =  new IScroll(this.$refs['screen'],{
+      scrollX:false,
+      scrollY:true,
+      preventDefault:false
+    })
+  },
   methods: {
     ...mapActions({
-      getClassify:'goods/getClassify'
+      getClassify:'goods/getClassify' ,
+      getSearch:'keywords/getSearch'
     }),
-    ...mapMutations({}),
+    ...mapMutations({
+     
+    }),
     selectPrice() {},
-
+    searchshow() {
+      this.searchShow.show = true
+    },
     //返回按钮
     back() {
       this.$router.go(-1);
@@ -230,9 +234,56 @@ export default {
      this.classifyData[index].active = true
     },
     //禁用touchmove事件
-    disableScreenTochmove() {},
+    scrollPreventDefault(e) {
+      // console.log(2);
+      e.preventDefault()
+    },
+    // 价格区间点击
+    priceDataclick(index) {
+      for(let i = 0;i<this.priceData.length;i++) {
+        if(this.priceData[i].active){
+          this.priceData[i].active= false
+          break
+        }
+      }
+      this.priceData[index].active = true
+      this.minprice = this.priceData[index].minprice
+      this.maxprice = this.priceData[index].maxprice
+    },
+    // 颜色
+    changeColor(index){
+      this.colorData[index].active = ! this.colorData[index].active
+      // for(let i = 0;i<this.colorData.length;i++){
+      //   if(this.colorData[i].active) {
+      //     this.colorData[i].active = false
+      //     break
+      //   }
+      // }
+      // this.colorData[index].active = true
+    },
+    // 重置按钮
+    submit() {
+      for(let i = 0;i<this.classifyData.length;i++) {
+        this.classifyData[i].active= false
+      }
+      for(let i = 0;i<this.priceData.length;i++) {
+        this.priceData[i].active = false
+      }
+      for(let i = 0;i<this.colorData.length;i++) {
+        this.colorData[i].active = false
+      }
+      this.minprice = ''
+      this.maxprice = ''
+    }
   },
-  beforeDestroy() {},
+  beforeDestroy() {
+    this.$refs['screen'].removeEventListener('touchmove',this.scrollPreventDefault)
+  },
+  beforeRouteUpdate (to,from,next) {
+    this.keyword = to.query.keyword
+    this.getSearch({keyword:this.keyword})
+    next()
+  },
 };
 </script>
 
@@ -423,7 +474,7 @@ body > div > div > div.search-top > div.order-main > div.\{\'order-item\'\:true\
 
 .goods-main .goods-list .goods-title {
   width: 95%;
-  height: 0.6rem;
+  height: 1rem;
   font-size: 0.28rem;
   overflow: hidden;
 }
@@ -473,7 +524,9 @@ body > div > div > div.search-top > div.order-main > div.\{\'order-item\'\:true\
   transform: translateX(0%);
   -webkit-transform: translateX(0%);
 }
-
+.no-data {
+  text-align: center;
+}
 .screen.unmove {
   transition: transform 0.3s;
   -webkit-transition: transform 0.3s;
