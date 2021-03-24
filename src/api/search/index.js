@@ -7,7 +7,8 @@ export function gethotData(data) {
 //搜索数据
 export function getSearchData(data) {
     let keyword = data.keyword
-    let url = config.baseApi + 'home/goods/search?kwords=' + keyword + '&param=&page=1&price1=&price2=&otype=all&cid=&token=' + config.token
+    let page = data.page || 1
+    let url = config.baseApi + 'home/goods/search?kwords=' + keyword + '&param=&page=' + page + '&price1=&price2=&otype=all&cid=&token=' + config.token
     console.log(url);
     return request(url)
 }

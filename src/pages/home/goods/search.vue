@@ -22,8 +22,9 @@
         </div>
       </div>
     </div>
-    <div class="goods-main">
-      <div class="goods-list" v-for="(item,index) in goods.goods" :key="index">
+    <div class="goods-main" ref="goods-main">
+     <div>
+        <div class="goods-list" v-for="(item,index) in goods.goods" :key="index">
         <div class="image">
           <img :src="item.image" />
         </div>
@@ -32,8 +33,9 @@
           <div class="price">¥{{item.price}}</div>
           <div class="sales">销量<span>{{item.sales}}</span>件</div>
         </div>
-      </div>
-      <div class="no-data" v-show="goods.length<=0">没有相关商品！</div>
+        </div>
+     </div>
+      <div class="no-data" v-show="goods.goods.length<=0">没有相关商品！</div>
     </div>
     <div
       ref="mask"
@@ -158,6 +160,8 @@ export default {
     }),
   },
   created() {
+    this.page = 1
+    this.flag = true
     //发送一次网络请求
     this.getClassify({success:() => {
     this.classifyData = this.classify
@@ -166,21 +170,42 @@ export default {
     this.classifyData[0].active = true
     this.$nextTick(() => {
       this.myscroll.refresh()
+      
     })
     }})
     this.minprice=this.priceData[0].minprice
     this.maxprice=this.priceData[0].maxprice
     this.keyword = this.$route.query.keyword
-    this.getSearch({keyword:this.keyword})
+    this.getSearch({keyword:this.keyword,success:() => {
+      this.$nextTick(() => {
+        this.myscroll1.refresh()
+      })
+    }})
   },
   mounted() {
     // IsScroll   使用IScroll的时候一定要注意 异步问题 由于数据是异步获取 刚开始iSscroll获取的高度是不正确的 所以需要在获取数据的时候重新计算domd元素的高度 在create里面获取dom 必须用this.$nextTick() 延迟获取dom
-     this.$refs['screen'].addEventListener('touchmove',this.scrollPreventDefault)
+    this.$refs['screen'].addEventListener('touchmove',this.scrollPreventDefault)
+    this.$refs['goods-main'].addEventListener('touchmove',this.scrollPreventDefault)
     this.myscroll =  new IScroll(this.$refs['screen'],{
       scrollX:false,
       scrollY:true,
       preventDefault:false
     })
+    this.myscroll1 =  new IScroll(this.$refs['goods-main'],{
+      scrollX:false,
+      scrollY:true,
+      preventDefault:false
+    })
+    this.myscroll1.on('scrollEnd',this.throttled1(
+      () => {
+      if(this.flag) {
+          this.getSearch({keyword:this.keyword,page:this.page+=1})
+      }
+      if(this.page == Number(this.goods.goods.page)) {
+        this.flag = false
+      }
+    }
+    ))
   },
   methods: {
     ...mapActions({
@@ -274,10 +299,22 @@ export default {
       }
       this.minprice = ''
       this.maxprice = ''
+    },
+    // 节流函数
+    throttled1(fn, delay = 1000) {
+    let oldtime = Date.now()
+    return function (...args) {
+        let newtime = Date.now()
+        if (newtime - oldtime >= delay) {
+            fn.apply(null, args)
+            oldtime = Date.now()
+        }
     }
+}
   },
   beforeDestroy() {
     this.$refs['screen'].removeEventListener('touchmove',this.scrollPreventDefault)
+    this.$refs['goods-main'].removeEventListener('touchmove',this.scrollPreventDefault)
   },
   beforeRouteUpdate (to,from,next) {
     this.keyword = to.query.keyword
@@ -436,7 +473,9 @@ body > div > div > div.search-top > div.order-main > div.\{\'order-item\'\:true\
 
 .goods-main {
   width: 100%;
-  height: auto;
+  /* height: auto; */
+  height: 566px;
+  overflow: hidden;
   margin-top: 2rem;
 }
 

@@ -28,6 +28,7 @@ export default {
         ['SET_GOODS'](state, payload) {
             state.goods.goods = payload.goods
             state.goods.page = payload.page
+            console.log(state.goods.goods);
         }
     },
     actions: {
@@ -41,10 +42,13 @@ export default {
         getSearch(conText, payload) {
             getSearchData(payload).then(res => {
                 if (res.code === 200) {
-                    console.log(res)
                     conText.commit('SET_GOODS', { goods: res.data, page: res.pageinfo.pagenum })
                 } else {
                     conText.commit('SET_GOODS', { goods: [] })
+                    console.log('空');
+                }
+                if (payload.success) {
+                    payload.success()
                 }
             })
         }
